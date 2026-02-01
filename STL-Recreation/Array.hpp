@@ -16,18 +16,18 @@ namespace stlr {
 			constexpr ConstIterator() : m_ptr{ nullptr } {}
 			constexpr ConstIterator(const ValueType* ptr) : m_ptr{ ptr } {}
 
-			constexpr const ValueType& operator*() const { return *m_ptr; }
-			constexpr const ValueType* operator->() const { return m_ptr; }
+			[[nodiscard]] constexpr const ValueType& operator*() const { return *m_ptr; }
+			[[nodiscard]] constexpr const ValueType* operator->() const { return m_ptr; }
 
 			constexpr ConstIterator& operator++() { ++m_ptr; return *this; }
 			constexpr ConstIterator& operator--() { --m_ptr; return *this; }
-			constexpr ConstIterator operator+(size_t n) const { return ConstIterator{ m_ptr + n }; }
-			constexpr ConstIterator operator-(size_t n) const { return ConstIterator{ m_ptr - n }; }
+			[[nodiscard]] constexpr ConstIterator operator+(size_t n) const { return ConstIterator{ m_ptr + n }; }
+			[[nodiscard]] constexpr ConstIterator operator-(size_t n) const { return ConstIterator{ m_ptr - n }; }
 
-			constexpr ptrdiff_t operator-(ConstIterator other) { return (m_ptr - other.m_ptr) / sizeof(ValueType); }
+			[[nodiscard]] constexpr ptrdiff_t operator-(ConstIterator other) { return (m_ptr - other.m_ptr) / sizeof(ValueType); }
 
-			constexpr auto operator<=>(const ConstIterator& other) const = default;
-			constexpr bool operator==(const ConstIterator& other) const = default;
+			[[nodiscard]] constexpr auto operator<=>(const ConstIterator& other) const = default;
+			[[nodiscard]] constexpr bool operator==(const ConstIterator& other) const = default;
 
 		private:
 			const ValueType* m_ptr;
@@ -55,27 +55,19 @@ namespace stlr {
 			}
 		}
 
-		constexpr size_t size() const noexcept { return Size; }
+		[[nodiscard]] constexpr size_t size() const noexcept { return Size; }
 
-		constexpr  T& operator[](size_t index) noexcept
+		[[nodiscard]] constexpr  T& operator[](size_t index) noexcept
 		{
 			return m_data[index];
 		}
 
-		constexpr const T& operator[](size_t index) const noexcept
+		[[nodiscard]] constexpr const T& operator[](size_t index) const noexcept
 		{
 			return m_data[index];
 		}
 
-		constexpr T& at(size_t index)
-		{
-			if (index >= Size)
-				throw std::runtime_error("Index out of bounds.");
-
-			return m_data[index];
-		}
-
-		constexpr const T& at(size_t index) const
+		[[nodiscard]] constexpr T& at(size_t index)
 		{
 			if (index >= Size)
 				throw std::runtime_error("Index out of bounds.");
@@ -83,18 +75,26 @@ namespace stlr {
 			return m_data[index];
 		}
 
-		constexpr Iterator begin() { return Iterator{ m_data }; }
-		constexpr Iterator end() { return Iterator{ m_data + Size }; }
-		constexpr ConstIterator cbegin() const { return ConstIterator{ m_data }; }
-		constexpr ConstIterator cend() const { return ConstIterator{ m_data + Size }; }
-		constexpr ReverseIterator rbegin() { return ReverseIterator{ end() }; }
-		constexpr ReverseIterator rend() { return ReverseIterator{ begin()}; }
-		constexpr ConstReverseIterator crbegin() const { return ConstReverseIterator{ cend() }; }
-		constexpr ConstReverseIterator crend() const { return ConstReverseIterator{ cbegin() }; }
-		constexpr ConstIterator begin() const { return cbegin(); }
-		constexpr ConstIterator end() const { return cend(); }
-		constexpr ConstReverseIterator rbegin() const { return crbegin(); }
-		constexpr ConstReverseIterator rend() const { return crend(); }
+		[[nodiscard]] constexpr const T& at(size_t index) const
+		{
+			if (index >= Size)
+				throw std::runtime_error("Index out of bounds.");
+
+			return m_data[index];
+		}
+
+		[[nodiscard]] constexpr Iterator begin() { return Iterator{ m_data }; }
+		[[nodiscard]] constexpr Iterator end() { return Iterator{ m_data + Size }; }
+		[[nodiscard]] constexpr ConstIterator cbegin() const { return ConstIterator{ m_data }; }
+		[[nodiscard]] constexpr ConstIterator cend() const { return ConstIterator{ m_data + Size }; }
+		[[nodiscard]] constexpr ReverseIterator rbegin() { return ReverseIterator{ end() }; }
+		[[nodiscard]] constexpr ReverseIterator rend() { return ReverseIterator{ begin()}; }
+		[[nodiscard]] constexpr ConstReverseIterator crbegin() const { return ConstReverseIterator{ cend() }; }
+		[[nodiscard]] constexpr ConstReverseIterator crend() const { return ConstReverseIterator{ cbegin() }; }
+		[[nodiscard]] constexpr ConstIterator begin() const { return cbegin(); }
+		[[nodiscard]] constexpr ConstIterator end() const { return cend(); }
+		[[nodiscard]] constexpr ConstReverseIterator rbegin() const { return crbegin(); }
+		[[nodiscard]] constexpr ConstReverseIterator rend() const { return crend(); }
 
 	private:
 		T m_data[Size];
