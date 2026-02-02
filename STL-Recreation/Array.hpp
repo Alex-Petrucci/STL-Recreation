@@ -8,34 +8,60 @@ namespace stlr {
 	class Array
 	{
 	public:
-		class ConstIterator
+		template<typename ValueType>
+		class BaseIterator
 		{
 		public:
-			using ValueType = T;
+			// typedefs below required for stl compatability
+			using iterator_category = std::random_access_iterator_tag;
+			using value_type = ValueType;
+			using difference_type = ptrdiff_t;
+			using reference = ValueType&;
+			using pointer = ValueType*;
 
-			constexpr ConstIterator() : m_ptr{ nullptr } {}
-			constexpr ConstIterator(const ValueType* ptr) : m_ptr{ ptr } {}
+			constexpr BaseIterator() : m_ptr{ nullptr } {}
+			constexpr BaseIterator(pointer ptr) : m_ptr{ ptr } {}
 
-			[[nodiscard]] constexpr const ValueType& operator*() const { return *m_ptr; }
-			[[nodiscard]] constexpr const ValueType* operator->() const { return m_ptr; }
+			[[nodiscard]] constexpr reference operator*() const { return *m_ptr; }
+			[[nodiscard]] constexpr pointer operator->() const { return m_ptr; }
 
-			constexpr ConstIterator& operator++() { ++m_ptr; return *this; }
-			constexpr ConstIterator& operator--() { --m_ptr; return *this; }
-			[[nodiscard]] constexpr ConstIterator operator+(size_t n) const { return ConstIterator{ m_ptr + n }; }
-			[[nodiscard]] constexpr ConstIterator operator-(size_t n) const { return ConstIterator{ m_ptr - n }; }
+			constexpr BaseIterator& operator++() { ++m_ptr; return *this; }
+			constexpr BaseIterator& operator--() { --m_ptr; return *this; }
 
-			[[nodiscard]] constexpr ptrdiff_t operator-(ConstIterator other) { return (m_ptr - other.m_ptr) / sizeof(ValueType); }
+			constexpr BaseIterator operator++(int)
+			{
+				BaseIterator copy = *this;
+				++(*this);
+				return copy;
+			}
 
-			[[nodiscard]] constexpr auto operator<=>(const ConstIterator& other) const = default;
-			[[nodiscard]] constexpr bool operator==(const ConstIterator& other) const = default;
+			constexpr BaseIterator operator--(int)
+			{
+				BaseIterator copy = *this;
+				--(*this);
+				return copy;
+			}
+
+			[[nodiscard]] constexpr BaseIterator operator+(difference_type n) const { return BaseIterator{ m_ptr + n }; }
+			[[nodiscard]] constexpr BaseIterator operator-(difference_type n) const { return BaseIterator{ m_ptr - n }; }
+			constexpr BaseIterator& operator+=(difference_type n) { m_ptr += n; return *this; }
+			constexpr BaseIterator& operator-=(difference_type n) { m_ptr -= n; return *this; }
+
+			constexpr reference operator[](difference_type n) const { return m_ptr[n]; }
+
+			[[nodiscard]] constexpr difference_type operator-(const BaseIterator& other) const { return m_ptr - other.m_ptr; }
+
+			[[nodiscard]] constexpr auto operator<=>(const BaseIterator& other) const = default;
+			[[nodiscard]] constexpr bool operator==(const BaseIterator& other) const = default;
 
 		private:
-			const ValueType* m_ptr;
+			pointer m_ptr;
 		};
 
-		using Iterator = MutableIteratorType<ConstIterator>;
-		using ReverseIterator = ReverseIteratorType<Iterator>;
-		using ConstReverseIterator = ReverseIteratorType<ConstIterator>;
+		using Iterator = BaseIterator<T>;
+		using ConstIterator = BaseIterator<const T>;
+		using ReverseIterator = stlr::ReverseIterator<Iterator>;
+		using ConstReverseIterator = stlr::ReverseIterator<ConstIterator>;
 
 		constexpr Array()
 			: m_data{}
@@ -88,7 +114,7 @@ namespace stlr {
 		[[nodiscard]] constexpr ConstIterator cbegin() const { return ConstIterator{ m_data }; }
 		[[nodiscard]] constexpr ConstIterator cend() const { return ConstIterator{ m_data + Size }; }
 		[[nodiscard]] constexpr ReverseIterator rbegin() { return ReverseIterator{ end() }; }
-		[[nodiscard]] constexpr ReverseIterator rend() { return ReverseIterator{ begin()}; }
+		[[nodiscard]] constexpr ReverseIterator rend() { return ReverseIterator{ begin() }; }
 		[[nodiscard]] constexpr ConstReverseIterator crbegin() const { return ConstReverseIterator{ cend() }; }
 		[[nodiscard]] constexpr ConstReverseIterator crend() const { return ConstReverseIterator{ cbegin() }; }
 		[[nodiscard]] constexpr ConstIterator begin() const { return cbegin(); }
