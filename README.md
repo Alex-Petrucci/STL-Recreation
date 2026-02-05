@@ -5,4 +5,5 @@ Header only.
 
 Currently contains:
 - Array
+- UniquePtr
 - ...more to be added in the future
