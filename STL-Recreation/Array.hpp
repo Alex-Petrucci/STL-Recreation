@@ -163,4 +163,7 @@ namespace stlr {
     private:
         T m_data[Size];
     };
+
+    template<typename T, typename... U>
+    Array(T, U...) -> Array<T, 1 + sizeof...(U)>;
 }
